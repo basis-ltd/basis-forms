@@ -1,70 +1,51 @@
 package datacollection.datacollection.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Entity(name = "Institution")
-@Table(name = "institutions")
+@Entity(name = "Category")
+@Table(name = "categories")
 @Setter
 @Getter
-public class Institution {
+public class Category {
+
     // ID
     @Id
     @GeneratedValue
-    private UUID id;
+    public UUID id;
 
     // NAME
     @Column(name = "name", nullable = false)
     private String name;
 
-    // EMAIL
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
-
-    // PHONE
-    @Column(name = "phone", nullable = true)
-    private String phone;
+    // DESCRIPTION
+    @Column(name = "description", nullable = true)
+    private String description;
 
     // IS ACTIVE
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
-
-    // ADDRESS
-    @Column(name = "address", nullable = true)
-    private String address;
-
-    // CATEGORY ID
-    @Column(name = "category_id", nullable = false)
-    private UUID categoryId;
 
     // CREATED AT
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
+    // INSTITUTIONS
+    @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<Institution> institutions;
+
     // UPDATED AT
     @Column(name = "updated_at", nullable = false)
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
-    // USERS
-    @OneToMany(mappedBy = "institution", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<User> users;
-
-    // CATEGORY
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false, referencedColumnName = "id", insertable = false, updatable = false)
-    private Category category;
 
     // PRE PERSIST
     @PrePersist

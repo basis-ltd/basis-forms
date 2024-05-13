@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+import static datacollection.datacollection.utils.Security.hashPassword;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
@@ -28,7 +29,15 @@ public class UserController {
             if (existingUser != null) {
                 return status(409).body(existingUser.getId());
             }
-            return status(201).body(userRepository.save(user));
+            User newUser = new User();
+            newUser.setFirstName(user.getFirstName());
+            newUser.setLastName(user.getLastName());
+            newUser.setEmail(user.getEmail());
+            newUser.setRole(user.getRole());
+            newUser.setPhone(user.getPhone());
+            newUser.setInstitutionId(user.getInstitutionId());
+            newUser.setPassword(hashPassword(user.getPassword()));
+            return status(201).body(userRepository.save(newUser));
         } catch (Exception e) {
             return status(500).body(e.getMessage());
         }
