@@ -1,5 +1,6 @@
 package datacollection.datacollection;
 
+import datacollection.datacollection.constants.Roles;
 import datacollection.datacollection.entities.Category;
 import datacollection.datacollection.entities.Institution;
 import datacollection.datacollection.entities.User;
@@ -49,7 +50,7 @@ public class DataCollectionApplication {
                 user.setLastName("Doe");
                 user.setEmail("princeelysee@gmail.com");
                 user.setPassword(hashPassword("password"));
-                user.setRole("admin");
+                user.setRole(Roles.ADMIN);
                 user.setPhone("1234567890");
                 user.setInstitutionId(institution.getId());
                 userRepository.save(user);

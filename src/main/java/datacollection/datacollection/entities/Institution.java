@@ -56,16 +56,6 @@ public class Institution {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    // USERS
-    @OneToMany(mappedBy = "institution", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<User> users;
-
-    // CATEGORY
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false, referencedColumnName = "id", insertable = false, updatable = false)
-    private Category category;
-
     // PRE PERSIST
     @PrePersist
     public void prePersist() {
@@ -78,4 +68,19 @@ public class Institution {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    // USERS
+    @OneToMany(mappedBy = "institution", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<User> users;
+
+    // CATEGORY
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false, referencedColumnName = "id", insertable = false, updatable = false)
+    private Category category;
+
+    // PROJECTS
+    @OneToMany(mappedBy = "institution", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Project> projects;
 }

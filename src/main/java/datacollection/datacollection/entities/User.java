@@ -1,11 +1,13 @@
 package datacollection.datacollection.entities;
 
+import datacollection.datacollection.constants.Roles;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "User")
@@ -37,8 +39,9 @@ public class User {
     private String password;
 
     // ROLE
+    @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private String role = "user";
+    private Roles role = Roles.USER;
 
     // PHONE
     @Column(name = "phone", nullable = true)
@@ -62,11 +65,6 @@ public class User {
     @Column(name = "institution_id", nullable = false)
     private UUID institutionId;
 
-    // INSTITUTION
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "institution_id", referencedColumnName = "id", insertable = false, updatable = false)
-    private Institution institution;
-
     // PRE PERSIST
     @PrePersist
     public void prePersist() {
@@ -79,4 +77,17 @@ public class User {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    // INSTITUTION
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "institution_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Institution institution;
+
+    // PROJECTS
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<Project> projects;
+
+    // FORMS
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<Form> forms;
 }
