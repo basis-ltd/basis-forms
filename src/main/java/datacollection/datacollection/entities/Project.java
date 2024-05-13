@@ -23,7 +23,7 @@ public class Project {
     private String name;
 
     // DESCRIPTION
-    @Column(name = "description", nullable = true)
+    @Column(name = "description", nullable = true, columnDefinition = "TEXT")
     private String description;
 
     // START DATE

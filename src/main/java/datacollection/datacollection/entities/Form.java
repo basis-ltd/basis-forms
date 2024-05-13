@@ -1,6 +1,5 @@
 package datacollection.datacollection.entities;
 
-import datacollection.datacollection.constants.FormVisibilities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +23,7 @@ public class Form {
     private String name;
 
     // DESCRIPTION
-    @Column(name = "description", nullable = true)
+    @Column(name = "description", nullable = true, columnDefinition = "TEXT")
     private String description;
 
     // IS ACTIVE
@@ -32,9 +31,8 @@ public class Form {
     private boolean isActive = true;
 
     // VISIBILITY
-    @Enumerated(EnumType.STRING)
     @Column(name = "visibility", nullable = false)
-    private FormVisibilities visibility = FormVisibilities.PUBLIC;
+    private String visibility = "public";
 
     // PROJECT ID
     @Column(name = "project_id", nullable = false)

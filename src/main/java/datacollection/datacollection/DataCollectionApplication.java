@@ -1,6 +1,5 @@
 package datacollection.datacollection;
 
-import datacollection.datacollection.constants.Roles;
 import datacollection.datacollection.entities.Category;
 import datacollection.datacollection.entities.Institution;
 import datacollection.datacollection.entities.User;
@@ -9,12 +8,12 @@ import datacollection.datacollection.repositories.InstitutionRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import datacollection.datacollection.repositories.UserRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.UUID;
 
 import static datacollection.datacollection.utils.Security.hashPassword;
 
@@ -50,7 +49,7 @@ public class DataCollectionApplication {
                 user.setLastName("Doe");
                 user.setEmail("princeelysee@gmail.com");
                 user.setPassword(hashPassword("password"));
-                user.setRole(Roles.ADMIN);
+                user.setRole("admin");
                 user.setPhone("1234567890");
                 user.setInstitutionId(institution.getId());
                 userRepository.save(user);

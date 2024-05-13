@@ -1,5 +1,6 @@
 package datacollection.datacollection.controllers;
 
+import datacollection.datacollection.dtos.UserDTO;
 import datacollection.datacollection.entities.User;
 import datacollection.datacollection.repositories.UserRepository;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class UserController {
     public ResponseEntity<Object> createUser(@RequestBody User user) {
         try {
             // CHECK IF EMAIL EXISTS
-            User existingUser = userRepository.findByEmail(user.getEmail());
+            UserDTO existingUser = userRepository.findByEmail(user.getEmail());
             if (existingUser != null) {
                 return status(409).body(existingUser.getId());
             }

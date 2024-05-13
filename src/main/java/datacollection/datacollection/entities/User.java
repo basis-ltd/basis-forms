@@ -1,6 +1,5 @@
 package datacollection.datacollection.entities;
 
-import datacollection.datacollection.constants.Roles;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -39,9 +38,8 @@ public class User {
     private String password;
 
     // ROLE
-    @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private Roles role = Roles.USER;
+    private String role = "user";
 
     // PHONE
     @Column(name = "phone", nullable = true)
@@ -79,7 +77,7 @@ public class User {
     }
 
     // INSTITUTION
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "institution_id", referencedColumnName = "id", insertable = false, updatable = false)
     private Institution institution;
 

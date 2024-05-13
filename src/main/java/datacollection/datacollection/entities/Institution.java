@@ -26,6 +26,10 @@ public class Institution {
     @Column(name = "name", nullable = false)
     private String name;
 
+    // DESCRIPTION
+    @Column(name = "description", nullable = true, columnDefinition = "TEXT")
+    private String description;
+
     // EMAIL
     @Column(name = "email", nullable = false, unique = true)
     private String email;
@@ -70,7 +74,7 @@ public class Institution {
     }
 
     // USERS
-    @OneToMany(mappedBy = "institution", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "institution", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<User> users;
 
