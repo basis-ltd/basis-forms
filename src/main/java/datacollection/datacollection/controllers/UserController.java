@@ -1,18 +1,21 @@
 package datacollection.datacollection.controllers;
 
+import datacollection.datacollection.dtos.UserAuthDTO;
 import datacollection.datacollection.dtos.UserDTO;
 import datacollection.datacollection.entities.User;
 import datacollection.datacollection.repositories.UserRepository;
+import datacollection.datacollection.utils.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-import static datacollection.datacollection.utils.Security.hashPassword;
+import static datacollection.datacollection.utils.PasswordEncoder.hashPassword;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping(value = "/api/users")
+@CrossOrigin(origins = "*")
 public class UserController {
 
     private final UserRepository userRepository;
@@ -26,7 +29,7 @@ public class UserController {
     public ResponseEntity<Object> createUser(@RequestBody User user) {
         try {
             // CHECK IF EMAIL EXISTS
-            UserDTO existingUser = userRepository.findByEmail(user.getEmail());
+            UserAuthDTO existingUser = userRepository.findByEmail(user.getEmail());
             if (existingUser != null) {
                 return status(409).body(existingUser.getId());
             }
@@ -86,7 +89,8 @@ public class UserController {
             // CHECK IF USER EXISTS
             User existingUser = userRepository.findById(id).orElse(null);
             if (existingUser == null) {
-                return status(404).body(null);
+                ApiResponse<Object> response = new ApiResponse<>("User not found", null);
+                return status(404).body(response);
             }
             userRepository.deleteById(id);
             return status(204).body(null);
@@ -99,10 +103,12 @@ public class UserController {
     @GetMapping(value = "/{id}")
     @ResponseBody
     public ResponseEntity<Object> getUserById(@PathVariable("id") UUID id) {
-        User user = userRepository.findById(id).orElse(null);
+        UserDTO user = userRepository.findUserById(id);
         if (user == null) {
-            return status(404).body(null);
+            ApiResponse<Object> userNotFound = new ApiResponse<>("User not found", null);
+            return status(404).body(userNotFound);
         }
-        return ResponseEntity.ok(user);
+        ApiResponse<Object> userFound = new ApiResponse<>("User found", user);
+        return ResponseEntity.ok(userFound);
     }
 }

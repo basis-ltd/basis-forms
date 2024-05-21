@@ -7,8 +7,8 @@ import lombok.Setter;
 @Setter
 @Getter
 @AllArgsConstructor
-public class ApiResponse<T> {
+public class AuthResponse<UserDTO> {
     private String message;
-    private T data;
+    String token;
+    private UserDTO user;
 }
-

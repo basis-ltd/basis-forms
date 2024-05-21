@@ -15,10 +15,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
-import static datacollection.datacollection.utils.Security.hashPassword;
+import static datacollection.datacollection.utils.PasswordEncoder.hashPassword;
 
 // Assuming your packages are structured correctly
-@SpringBootApplication
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @EnableJpaAuditing
 @RequestMapping(value = "/api")
 public class DataCollectionApplication {

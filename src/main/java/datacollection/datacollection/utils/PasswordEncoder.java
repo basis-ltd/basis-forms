@@ -4,7 +4,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.security.SecureRandom;
 
-public class Security {
+public class PasswordEncoder {
 
     // HASH PASSWORD
     public static String hashPassword(String password) {
