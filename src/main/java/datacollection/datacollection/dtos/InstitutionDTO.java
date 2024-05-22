@@ -1,5 +1,6 @@
 package datacollection.datacollection.dtos;
 
+import datacollection.datacollection.entities.Institution;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

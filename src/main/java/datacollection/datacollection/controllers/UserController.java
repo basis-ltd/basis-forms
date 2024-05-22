@@ -1,10 +1,15 @@
 package datacollection.datacollection.controllers;
 
+import datacollection.datacollection.dtos.InstitutionDTO;
 import datacollection.datacollection.dtos.UserAuthDTO;
 import datacollection.datacollection.dtos.UserDTO;
 import datacollection.datacollection.entities.User;
+import datacollection.datacollection.repositories.InstitutionRepository;
 import datacollection.datacollection.repositories.UserRepository;
+import datacollection.datacollection.services.MailService;
 import datacollection.datacollection.utils.ApiResponse;
+import datacollection.datacollection.utils.StringsUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +24,14 @@ import static org.springframework.http.ResponseEntity.status;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final InstitutionRepository institutionRepository;
+    private final StringsUtils stringsUtils = new StringsUtils();
+    @Autowired
+    private MailService mailService;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, InstitutionRepository institutionRepository) {
         this.userRepository = userRepository;
+        this.institutionRepository = institutionRepository;
     }
 
     // CREATE USER
@@ -31,8 +41,22 @@ public class UserController {
             // CHECK IF EMAIL EXISTS
             UserAuthDTO existingUser = userRepository.findByEmail(user.getEmail());
             if (existingUser != null) {
-                return status(409).body(existingUser.getId());
+                ApiResponse<Object> userConflict = new ApiResponse<>("User already exists", existingUser.getId());
+                return status(409).body(userConflict);
             }
+
+            // GENERATE PASSWORD
+            String password = stringsUtils.generateRandomString(8);
+
+            // CHECK IF INSTITUTION EXISTS
+            InstitutionDTO institutionExists = institutionRepository.findInstitutionById(user.getInstitutionId());
+
+            // IF INSTITUTION DOES NOT EXIST
+            if (institutionExists == null) {
+                ApiResponse<Object> institutionNotFound = new ApiResponse<>("Institution not found", null);
+                return status(404).body(institutionNotFound);
+            }
+
             User newUser = new User();
             newUser.setFirstName(user.getFirstName());
             newUser.setLastName(user.getLastName());
@@ -40,8 +64,16 @@ public class UserController {
             newUser.setRole(user.getRole());
             newUser.setPhone(user.getPhone());
             newUser.setInstitutionId(user.getInstitutionId());
-            newUser.setPassword(hashPassword(user.getPassword()));
-            return status(201).body(userRepository.save(newUser));
+            newUser.setPassword(hashPassword(password));
+
+            ApiResponse<Object> response = new ApiResponse<>("User created successfully", userRepository.save(newUser));
+            // SEND EMAIL TO USER
+            mailService.sendMail(
+                    newUser.getEmail(),
+                    "Account Created",
+                    "Your account has been created successfully. \n\nAccess your account using the following password: " + password
+            );
+            return status(201).body(response);
         } catch (Exception e) {
             return status(500).body(e.getMessage());
         }
@@ -75,11 +107,15 @@ public class UserController {
             value = "role",
             required = false) String role) {
         if (institutionId != null) {
-            return status(200).body(userRepository.findByInstitutionId(institutionId));
-        } if (role != null) {
-            return status(200).body(userRepository.findByRole(role));
+            ApiResponse<Object> usersList = new ApiResponse<>("Users retrieved successfully", userRepository.findByInstitutionId(institutionId));
+            return status(200).body(usersList);
         }
-        return status(200).body(userRepository.findAll());
+        if (role != null) {
+            ApiResponse<Object> usersList = new ApiResponse<>("Users retrieved successfully", userRepository.findByRole(role));
+            return status(200).body(usersList);
+        }
+        ApiResponse<Object> usersList = new ApiResponse<>("Users retrieved successfully", userRepository.findAll());
+        return status(200).body(usersList);
     }
 
     // DELETE USER

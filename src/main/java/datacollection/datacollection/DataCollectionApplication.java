@@ -37,7 +37,7 @@ public class DataCollectionApplication {
                 User user = new User();
                 Institution institution = new Institution();
                 Category category = new Category();
-                category.setName("Category");
+                category.setName("category");
                 category.setDescription("Description");
                 categoryRepository.save(category);
                 institution.setName("University");
