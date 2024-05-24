@@ -1,5 +1,6 @@
 package datacollection.datacollection.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -77,12 +78,13 @@ public class User {
     }
 
     // INSTITUTION
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "institution_id", referencedColumnName = "id", insertable = false, updatable = false)
     private Institution institution;
 
     // PROJECTS
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JsonBackReference
     private List<Project> projects;
 
     // FORMS

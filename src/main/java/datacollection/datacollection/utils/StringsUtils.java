@@ -1,5 +1,6 @@
 package datacollection.datacollection.utils;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -20,5 +21,9 @@ public class StringsUtils {
         Map<String, Object> map = new HashMap<>();
         map.put("id", id);
         return map;
+    }
+
+    public LocalDateTime createDateFromString(String date) {
+        return LocalDateTime.parse(date);
     }
 }

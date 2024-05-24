@@ -1,6 +1,8 @@
 package datacollection.datacollection.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,7 +43,7 @@ public class Category {
 
     // INSTITUTIONS
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-//    @JsonIgnore
+    @JsonBackReference
     private List<Institution> institutions;
 
     // UPDATED AT

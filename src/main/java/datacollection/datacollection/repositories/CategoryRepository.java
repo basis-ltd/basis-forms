@@ -10,19 +10,9 @@ import java.util.UUID;
 
 public interface CategoryRepository extends JpaRepository<Category, UUID> {
 
-    @Query("SELECT new datacollection.datacollection.dtos.CategoryDTO(" +
-            "c.id, c.name, c.description, c.isActive, c.createdAt, c.updatedAt) " +
-            "FROM Category c WHERE c.name = :name")
-    CategoryDTO findByName(String name);
-    Category findByDescription(String description);
+    @Query("SELECT c FROM Category c WHERE c.name = :name")
+    Category findByName(String name);
 
-    @Query("SELECT new datacollection.datacollection.dtos.CategoryDTO(" +
-            "c.id, c.name, c.description, c.isActive, c.createdAt, c.updatedAt) " +
-            "FROM Category c WHERE c.id = :id")
-    CategoryDTO findCategoryById(UUID id);
+    Category findCategoryById(UUID id);
 
-    @Query("SELECT new datacollection.datacollection.dtos.CategoryDTO(" +
-            "c.id, c.name, c.description, c.isActive, c.createdAt, c.updatedAt) " +
-            "FROM Category c")
-    List<CategoryDTO> findAllCategories();
 }

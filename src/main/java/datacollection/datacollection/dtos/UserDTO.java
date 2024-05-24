@@ -1,6 +1,5 @@
 package datacollection.datacollection.dtos;
 
-import datacollection.datacollection.entities.Institution;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,9 +19,11 @@ public class UserDTO {
     private String lastName;
     private String email;
     private String role;
+    private String phone;
     private boolean isActive;
     private UUID institutionId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private InstitutionDTO institution;
 }
+

@@ -1,7 +1,7 @@
 package datacollection.datacollection.controllers;
 
-import datacollection.datacollection.dtos.CategoryDTO;
 import datacollection.datacollection.dtos.InstitutionDTO;
+import datacollection.datacollection.entities.Category;
 import datacollection.datacollection.entities.Institution;
 import datacollection.datacollection.repositories.CategoryRepository;
 import datacollection.datacollection.repositories.InstitutionRepository;
@@ -31,7 +31,7 @@ public class InstitutionController {
     public ResponseEntity<Object> fetchInstitutions(@RequestParam(required = false) UUID categoryId) {
         try {
             if (categoryId != null) {
-                CategoryDTO categoryExists = categoryRepository.findCategoryById(categoryId);
+                Category categoryExists = categoryRepository.findCategoryById(categoryId);
                 if (categoryExists == null) {
                     ApiResponse<Object> categoryNotFound = new ApiResponse<>("Category not found", null);
                     return ResponseEntity.status(404).body(categoryNotFound);
@@ -39,7 +39,7 @@ public class InstitutionController {
                 ApiResponse<Object> categoryInstitutions = new ApiResponse<>("Institutions found successfully", institutionRepository.findInstitutionByCategoryId(categoryId));
                 return ResponseEntity.status(200).body(categoryInstitutions);
             }
-            ApiResponse<Object> allInstitutions = new ApiResponse<>("Institutions found successfully", institutionRepository.findAllInstitutions());
+            ApiResponse<Object> allInstitutions = new ApiResponse<>("Institutions found successfully", institutionRepository.findAll());
             return ResponseEntity.status(200).body(allInstitutions);
         } catch (Exception e) {
             ApiResponse<Object> responseBadRequest = new ApiResponse<>(e.getMessage(), null);
@@ -48,8 +48,8 @@ public class InstitutionController {
     }
 
     // CREATE INSTITUTION
-    @PostMapping(value = "")
-    public ResponseEntity<Object> createInstitution(@RequestBody Institution institution) {
+    @PostMapping(value = "", consumes = {"application/xml","application/json"})
+    public ResponseEntity<Object> createInstitution(@RequestBody InstitutionDTO institution) {
         try {
             // CHECK IF INSTITUTION EXISTS
             InstitutionDTO institutionExists = institutionRepository.findByEmail(institution.getEmail());
@@ -59,7 +59,7 @@ public class InstitutionController {
             }
 
             // CHECK IF CATEGORY EXISTS
-            CategoryDTO categoryExists = categoryRepository.findCategoryById(institution.getCategoryId());
+            Category categoryExists = categoryRepository.findCategoryById(institution.getCategoryId());
             if (categoryExists == null) {
                 ApiResponse<Object> categoryNotFound = new ApiResponse<>("Category not found", null);
                 return ResponseEntity.status(404).body(categoryNotFound);
@@ -75,7 +75,7 @@ public class InstitutionController {
         }
     }
 
-    private static Institution getNewInstitution(Institution institution) {
+    private static Institution getNewInstitution(InstitutionDTO institution) {
         Institution newInstitution = new Institution();
         newInstitution.setName(institution.getName());
         newInstitution.setCategoryId(institution.getCategoryId());
@@ -89,7 +89,7 @@ public class InstitutionController {
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Object> deleteInstitution(@PathVariable UUID id) {
         try {
-            Institution institutionExists = institutionRepository.findInstitutionToDelete(id);
+            Institution institutionExists = institutionRepository.getInstitutionDetails(id);
             if (institutionExists == null) {
                 ApiResponse<Object> institutionNotFound = new ApiResponse<>("Institution not found", null);
                 return ResponseEntity.status(404).body(institutionNotFound);
@@ -107,7 +107,7 @@ public class InstitutionController {
     @GetMapping(value = "/{id}")
     public ResponseEntity<Object> getInstitutionById(@PathVariable UUID id) {
         try {
-            InstitutionDTO institutionExists = institutionRepository.findInstitutionById(id);
+            Institution institutionExists = institutionRepository.getInstitutionDetails(id);
             if (institutionExists == null) {
                 ApiResponse<Object> institutionNotFound = new ApiResponse<>("Institution not found", null);
                 return ResponseEntity.status(404).body(institutionNotFound);
@@ -124,14 +124,14 @@ public class InstitutionController {
     @PutMapping(value = "/{id}")
     public ResponseEntity<Object> updateInstitution(@PathVariable UUID id, @RequestBody Institution institution) {
         try {
-            Institution institutionExists = institutionRepository.findInstitutionToUpdate(id);
+            Institution institutionExists = institutionRepository.getInstitutionDetails(id);
             if (institutionExists == null) {
                 ApiResponse<Object> institutionNotFound = new ApiResponse<>("Institution not found", null);
                 return ResponseEntity.status(404).body(institutionNotFound);
             }
 
             // CHECK IF CATEGORY EXISTS
-            CategoryDTO categoryExists = categoryRepository.findCategoryById(institution.getCategoryId());
+            Category categoryExists = categoryRepository.findCategoryById(institution.getCategoryId());
             if (categoryExists == null) {
                 ApiResponse<Object> categoryNotFound = new ApiResponse<>("Category not found", null);
                 return ResponseEntity.status(404).body(categoryNotFound);

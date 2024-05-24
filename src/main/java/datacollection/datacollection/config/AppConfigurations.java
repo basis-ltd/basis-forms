@@ -26,12 +26,6 @@ public class AppConfigurations {
     @Value("${spring.jpa.show-sql}")
     private boolean showSql;
 
-    @Value("${spring.mail.host}")
-    private String mailHost;
-
-    @Value("${spring.mail.port}")
-    private int mailPort;
-
     @Value("${spring.sendgrid.api-key}")
     private String sendgridApiKey;
 

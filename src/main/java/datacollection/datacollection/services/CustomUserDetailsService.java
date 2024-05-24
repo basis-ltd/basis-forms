@@ -1,7 +1,6 @@
 package datacollection.datacollection.services;
 
 import datacollection.datacollection.dtos.UserAuthDTO;
-import datacollection.datacollection.dtos.UserDTO;
 import datacollection.datacollection.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
