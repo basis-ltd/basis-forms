@@ -88,6 +88,7 @@ public class User {
     private List<Project> projects;
 
     // FORMS
+    @JsonBackReference
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Form> forms;
 }
