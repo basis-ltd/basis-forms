@@ -1,11 +1,14 @@
 package datacollection.datacollection.controllers;
 
 import datacollection.datacollection.dtos.FormDTO;
+import datacollection.datacollection.dtos.FormSectionDTO;
 import datacollection.datacollection.dtos.ProjectDTO;
 import datacollection.datacollection.dtos.UserDTO;
 import datacollection.datacollection.entities.Form;
+import datacollection.datacollection.entities.Section;
 import datacollection.datacollection.repositories.FormRepository;
 import datacollection.datacollection.repositories.ProjectRepository;
+import datacollection.datacollection.repositories.SectionRepository;
 import datacollection.datacollection.repositories.UserRepository;
 import datacollection.datacollection.utils.ApiResponse;
 import datacollection.datacollection.utils.StringsUtils;
@@ -13,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,15 +24,20 @@ import java.util.UUID;
 @CrossOrigin(origins = "*")
 public class FormController {
 
+    // REPOSITORIES
     private final FormRepository formRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final SectionRepository sectionRepository;
+
+    // UTILS
     private final StringsUtils stringsUtils = new StringsUtils();
 
-    public FormController(ProjectRepository projectRepository, FormRepository formRepository, UserRepository userRepository) {
+    public FormController(ProjectRepository projectRepository, FormRepository formRepository, UserRepository userRepository, SectionRepository sectionRepository) {
         this.projectRepository = projectRepository;
         this.formRepository = formRepository;
         this.userRepository = userRepository;
+        this.sectionRepository = sectionRepository;
     }
 
     // CREATE FORM
@@ -76,11 +85,20 @@ public class FormController {
             newForm.setVisibility(form.getVisibility());
             newForm.setProjectId(form.getProjectId());
             newForm.setUserId(form.getUserId());
+            form.setSectionsCount(0L);
 
-            System.out.println(newForm);
+            Form formCreated =  formRepository.save(newForm);
+            // CREATE DEFAULT SECTION
+            Section generalSection = new Section();
+            generalSection.setName("general");
+            generalSection.setDescription("default section");
+            generalSection.setFormId(formCreated.getId());
+            generalSection.setSequence(1);
+            sectionRepository.save(generalSection);
 
-            ApiResponse<Object> formCreated = new ApiResponse<>("Form created successfully", formRepository.save(newForm));
-            return ResponseEntity.status(HttpStatus.OK).body(formCreated);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ApiResponse<>("Form created successfully", formCreated)
+            );
         } catch (Exception e) {
             ApiResponse<Object> serverError = new ApiResponse<>(e.getMessage(), null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(serverError);
@@ -118,11 +136,21 @@ public class FormController {
     @GetMapping(value = "/{id}")
     public ResponseEntity<Object> findFormById(@PathVariable UUID id) {
         try {
+
+            // FETCH FORMS
             FormDTO formExists = formRepository.findFormById(id);
+
             if (formExists == null) {
                 ApiResponse<Object> formNotFound = new ApiResponse<>("Form not found", null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(formNotFound);
             }
+
+            // FETCH SECTIONS
+            List<FormSectionDTO> formSections = sectionRepository.findByFormId(id);
+
+            // ASSIGN SECTIONS TO FORM
+            formExists.setSections(formSections);
+
             ApiResponse<Object> formFound = new ApiResponse<>("Form found", formExists);
             return ResponseEntity.status(HttpStatus.OK).body(formFound);
         } catch (Exception e) {

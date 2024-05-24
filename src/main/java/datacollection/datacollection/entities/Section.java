@@ -1,6 +1,5 @@
 package datacollection.datacollection.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,18 +7,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
-@Entity(name = "Form")
-@Table(name = "forms")
-@Setter
+@Entity(name = "Section")
+@Table(name = "sections")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Form {
+public class Section {
+
     // ID
     @Id
     @GeneratedValue
@@ -30,24 +30,16 @@ public class Form {
     private String name;
 
     // DESCRIPTION
-    @Column(name = "description", nullable = true, columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    // VISIBILITY
-    @Column(name = "visibility", nullable = false)
-    private String visibility;
+    // ORDER
+    @Column(name = "sequence", nullable = false)
+    private int sequence;
 
-    // IS ACTIVE
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
-
-    // PROJECT ID
-    @Column(name = "project_id", nullable = false)
-    private UUID projectId;
-
-    // USER ID
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    // FORM ID
+    @Column(name = "form_id", nullable = false)
+    private UUID formId;
 
     // CREATED AT
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -56,6 +48,7 @@ public class Form {
 
     // UPDATED AT
     @Column(name = "updated_at", nullable = false)
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
     // PRE PERSIST
@@ -71,20 +64,9 @@ public class Form {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // PROJECT
+    // FORM
+    @ManyToOne
     @JsonManagedReference
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "project_id", insertable = false, updatable = false)
-    private Project project;
-
-    // USER
-    @JsonManagedReference
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    private User user;
-
-    // SECTIONS
-    @JsonBackReference
-    @OneToMany(mappedBy = "form", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Section> sections;
+    @JoinColumn(name = "form_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Form form;
 }
