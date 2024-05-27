@@ -87,4 +87,9 @@ public class Form {
     @JsonBackReference
     @OneToMany(mappedBy = "form", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Section> sections;
+
+    // ENTRIES
+    @JsonBackReference
+    @OneToMany(mappedBy = "form", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Entry> entries;
 }

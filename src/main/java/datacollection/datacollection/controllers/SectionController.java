@@ -187,7 +187,7 @@ public class SectionController {
             int countSections = sectionRepository.countByFormId(sectionExists.getFormId());
 
             // UPDATE CURRENT SECTION'S SEQUENCE
-            sectionService.updateSectionSequence(sectionExists, countSections + 1);
+            sectionService.updateSectionSequence(sectionExists, countSections);
 
             // DELETE SECTION
             sectionRepository.deleteById(id);

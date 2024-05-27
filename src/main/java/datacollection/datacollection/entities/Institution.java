@@ -45,7 +45,7 @@ public class Institution {
     private boolean isActive = true;
 
     // ADDRESS
-    @Column(name = "address", nullable = true)
+    @Column(name = "address")
     private String address;
 
     // CATEGORY ID

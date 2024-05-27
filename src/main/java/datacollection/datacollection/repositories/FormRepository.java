@@ -72,4 +72,14 @@ public interface FormRepository extends JpaRepository<Form, UUID> {
     @Query("UPDATE Form f SET f.name = ?1, f.description = ?2, f.visibility = ?3, f.isActive = ?4, f.projectId = ?5, f.userId = ?6 WHERE f.id = ?7")
     int updateForm(String name, String description, String visibility, boolean isActive, UUID projectId, UUID userId, UUID formId);
 
+    // FIND FORMS BY INSTITUTION ID
+    @Query("SELECT new datacollection.datacollection.dtos.FormDTO(f.id, f.name, f.description, f.visibility, f.isActive, f.projectId, f.userId, (SELECT COUNT(s.id) FROM Section s WHERE s.formId = f.id), f.createdAt, f.updatedAt, " +
+            "new datacollection.datacollection.dtos.ProjectDTO(p.id, p.name, p.description, p.startDate, p.endDate, p.isActive, p.institutionId, p.userId, p.createdAt, p.updatedAt, null, null), " +
+            "new datacollection.datacollection.dtos.CreatedByDTO(u.id, u.firstName, u.lastName, u.email, u.role, u.institutionId, u.createdAt, u.updatedAt), null) " +
+            "FROM Form f " +
+            "JOIN Project p ON f.projectId = p.id " +
+            "JOIN User u ON f.userId = u.id " +
+            "WHERE p.institutionId = ?1 ORDER BY f.createdAt DESC")
+    List<FormDTO> findFormsByInstitutionId(UUID institutionId);
+
 }

@@ -85,38 +85,42 @@ public class UserController {
     public ResponseEntity<Object> updateUser(@RequestBody UserDTO user, @PathVariable UUID id) {
         try {
             // CHECK IF USER EXISTS
-            UserDTO existingUser = userRepository.findUserById(id);
+            User existingUser = userRepository.findById(id).orElse(null);
             if (existingUser == null) {
                 ApiResponse<Object> userNotFound = new ApiResponse<>("User not found", null);
                 return status(404).body(userNotFound);
             }
 
-            // CHECK IF INSTITUTION EXISTS
-            InstitutionDTO institutionExists = institutionRepository.findInstitutionById(user.getInstitutionId());
+            // CHECK IF INSTITUTION EXISTS WHEN PROVIDED
+            if (user.getInstitutionId() != null) {
+                InstitutionDTO institutionExists = institutionRepository.findInstitutionById(user.getInstitutionId());
 
-            // IF INSTITUTION DOES NOT EXIST
-            if (institutionExists == null) {
-                ApiResponse<Object> institutionNotFound = new ApiResponse<>("Institution not found", null);
-                return status(404).body(institutionNotFound);
+                // IF INSTITUTION DOES NOT EXIST
+                if (institutionExists == null) {
+                    ApiResponse<Object> institutionNotFound = new ApiResponse<>("Institution not found", null);
+                    return status(404).body(institutionNotFound);
+                }
             }
 
-            existingUser.setFirstName(user.getFirstName());
-            existingUser.setLastName(user.getLastName());
-            existingUser.setRole(user.getRole());
-            existingUser.setPhone(user.getPhone());
-            existingUser.setInstitutionId(user.getInstitutionId());
-            int userUpdated = userRepository.updateUser(
-                    existingUser.getFirstName(),
-                    existingUser.getLastName(),
-                    existingUser.getRole(),
-                    existingUser.getPhone(),
-                    existingUser.isActive(),
-                    existingUser.getInstitutionId(),
-                    existingUser.getUpdatedAt(),
-                    existingUser.getId()
-            );
+            // PARTIAL UPDATES
+            if (user.getFirstName() != null) {
+                existingUser.setFirstName(user.getFirstName());
+            }
+            if (user.getLastName() != null) {
+                existingUser.setLastName(user.getLastName());
+            }
+            if (user.getRole() != null) {
+                existingUser.setRole(user.getRole());
+            }
+            if (user.getPhone() != null) {
+                existingUser.setPhone(user.getPhone());
+            }
+            if (user.getInstitutionId() != null) {
+                existingUser.setInstitutionId(user.getInstitutionId());
+            }
+            userRepository.save(existingUser);
             return status(200).body(
-                    new ApiResponse<>("User updated successfully", userUpdated == 1)
+                    new ApiResponse<>("User updated successfully", true)
             );
         } catch (Exception e) {
             ApiResponse<Object> eResponse = new ApiResponse<>(e.getMessage(), null);

@@ -54,7 +54,7 @@ public class InstitutionController {
             // CHECK IF INSTITUTION EXISTS
             InstitutionDTO institutionExists = institutionRepository.findByEmail(institution.getEmail());
             if (institutionExists != null) {
-                ApiResponse<Object> institutionConflict = new ApiResponse<>("Institution already exists", stringsUtils.mapIdToObject(institutionExists.getId()));
+                ApiResponse<Object> institutionConflict = new ApiResponse<>("Institution with this email already exists", stringsUtils.mapIdToObject(institutionExists.getId()));
                 return ResponseEntity.status(409).body(institutionConflict);
             }
 

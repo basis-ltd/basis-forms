@@ -107,8 +107,16 @@ public class FormController {
 
     // FETCH FORMS
     @GetMapping(value = "")
-    public ResponseEntity<Object> fetchForms(@RequestParam(required = false, value = "projectId") UUID projectId, @RequestParam(value = "userId", required = false) UUID userId) {
+    public ResponseEntity<Object> fetchForms(@RequestParam(required = false, value = "projectId") UUID projectId, @RequestParam(value = "userId", required = false) UUID userId, @RequestParam(value
+            = "institutionId", required = false) UUID institutionId) {
         try {
+
+            // FETCH ALL FORMS IN AN INSTITUTION
+            if (institutionId != null) {
+                ApiResponse<Object> responseFetched = new ApiResponse<>("Forms fetched successfully", formRepository.findFormsByInstitutionId(institutionId));
+                return ResponseEntity.status(HttpStatus.OK).body(responseFetched);
+            }
+
             if (projectId != null || userId != null) {
                 // FIND PROJECT FORMS
                 if (userId == null) {
