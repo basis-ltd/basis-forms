@@ -27,7 +27,7 @@ public class CategoryController {
     @GetMapping(value = "")
     public ResponseEntity<Object> fetchCategories() {
         try {
-            ApiResponse<List<CategoryDTO>> allCategories = new ApiResponse<>("Categories found successfully", categoryRepository.findAllCategories());
+            ApiResponse<List<Category>> allCategories = new ApiResponse<>("Categories found successfully", categoryRepository.findAll());
             return ResponseEntity.status(200).body(allCategories);
         } catch (Exception e) {
             ApiResponse<Object> responseBadRequest = new ApiResponse<>(e.getMessage(), null);
@@ -39,7 +39,7 @@ public class CategoryController {
     @GetMapping(value = "/{id}")
     public ResponseEntity<Object> fetchCategoryById(@PathVariable UUID id) {
         try {
-            CategoryDTO categoryExists = categoryRepository.findCategoryById(id);
+            Category categoryExists = categoryRepository.findCategoryById(id);
             if (categoryExists == null) {
                 ApiResponse<Object> categoryNotFound = new ApiResponse<>("Category not found", null);
                 return ResponseEntity.status(404).body(categoryNotFound);
@@ -56,7 +56,7 @@ public class CategoryController {
     @PostMapping(value = "")
     public ResponseEntity<Object> createCategory(@RequestBody CategoryDTO category) {
         try {
-            CategoryDTO categoryExists = categoryRepository.findByName(category.getName());
+            Category categoryExists = categoryRepository.findByName(category.getName());
             if (categoryExists != null) {
                 System.out.println(stringsUtils.mapIdToObject(categoryExists.getId()));
                 ApiResponse<Object> categoryConflict = new ApiResponse<>("Category already exists", stringsUtils.mapIdToObject(categoryExists.getId()));
@@ -78,14 +78,14 @@ public class CategoryController {
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Object> deleteCategory(@PathVariable UUID id) {
         try {
-            CategoryDTO categoryExists = categoryRepository.findCategoryById(id);
+            Category categoryExists = categoryRepository.findCategoryById(id);
             if (categoryExists == null) {
                 ApiResponse<Object> categoryNotFound = new ApiResponse<>("Category not found", null);
                 return ResponseEntity.status(404).body(categoryNotFound);
             }
             categoryRepository.deleteById(id);
             ApiResponse<Object> categoryDeleted = new ApiResponse<>("Category deleted successfully", null);
-            return ResponseEntity.status(200).body(categoryDeleted);
+            return ResponseEntity.status(204).body(categoryDeleted);
         } catch (Exception e) {
             ApiResponse<Object> responseBadRequest = new ApiResponse<>(e.getMessage(), null);
             return ResponseEntity.status(500).body(responseBadRequest);
@@ -96,10 +96,19 @@ public class CategoryController {
     @PatchMapping(value = "/{id}")
     public ResponseEntity<Object> updateCategory(@PathVariable UUID id, @RequestBody CategoryDTO category) {
         try {
-            CategoryDTO categoryExists = categoryRepository.findCategoryById(id);
+            Category categoryExists = categoryRepository.findCategoryById(id);
+
+            // CHECK IF CATEGORY EXISTS
             if (categoryExists == null) {
                 ApiResponse<Object> categoryNotFound = new ApiResponse<>("Category not found", null);
                 return ResponseEntity.status(404).body(categoryNotFound);
+            }
+
+            // CHECK IF CATEGORY NAME EXISTS
+            Category categoryExistsByName = categoryRepository.findByName(category.getName());
+            if (categoryExistsByName != null && !categoryExistsByName.getId().equals(id)) {
+                ApiResponse<Object> categoryConflict = new ApiResponse<>("Category with this name already exists", stringsUtils.mapIdToObject(categoryExistsByName.getId()));
+                return ResponseEntity.status(409).body(categoryConflict);
             }
             Category updatedCategory = new Category();
             updatedCategory.setId(id);

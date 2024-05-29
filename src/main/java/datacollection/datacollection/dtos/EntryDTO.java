@@ -8,21 +8,19 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Setter
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
-public class UserAuthDTO {
+@AllArgsConstructor
+public class EntryDTO {
+
     private UUID id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String password;
-    private String role;
-    private String phone;
-    private boolean isActive;
-    private UUID institutionId;
+    private String status;
+    private int progress;
+    private UUID formId;
+    private UUID userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private InstitutionDTO institution;
+    private FormDTO form;
+    private CreatedByDTO user;
 }

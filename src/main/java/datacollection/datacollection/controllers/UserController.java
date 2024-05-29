@@ -36,12 +36,12 @@ public class UserController {
 
     // CREATE USER
     @PostMapping(value = "")
-    public ResponseEntity<Object> createUser(@RequestBody User user) {
+    public ResponseEntity<Object> createUser(@RequestBody UserDTO user) {
         try {
             // CHECK IF EMAIL EXISTS
             UserAuthDTO existingUser = userRepository.findByEmail(user.getEmail());
             if (existingUser != null) {
-                ApiResponse<Object> userConflict = new ApiResponse<>("User already exists", existingUser.getId());
+                ApiResponse<Object> userConflict = new ApiResponse<>("User already exists", existingUser);
                 return status(409).body(userConflict);
             }
 
@@ -75,26 +75,56 @@ public class UserController {
             );
             return status(201).body(response);
         } catch (Exception e) {
-            return status(500).body(e.getMessage());
+            ApiResponse<Object> eResponse = new ApiResponse<>(e.getMessage(), null);
+            return status(500).body(eResponse);
         }
     }
 
     // UPDATE USER
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<Object> updateUser(@RequestBody User user, @PathVariable UUID id) {
+    public ResponseEntity<Object> updateUser(@RequestBody UserDTO user, @PathVariable UUID id) {
         try {
             // CHECK IF USER EXISTS
             User existingUser = userRepository.findById(id).orElse(null);
             if (existingUser == null) {
-                return status(404).body(null);
+                ApiResponse<Object> userNotFound = new ApiResponse<>("User not found", null);
+                return status(404).body(userNotFound);
             }
-            existingUser.setFirstName(user.getFirstName());
-            existingUser.setLastName(user.getLastName());
-            existingUser.setRole(user.getRole());
-            existingUser.setPhone(user.getPhone());
-            return status(200).body(userRepository.save(existingUser));
+
+            // CHECK IF INSTITUTION EXISTS WHEN PROVIDED
+            if (user.getInstitutionId() != null) {
+                InstitutionDTO institutionExists = institutionRepository.findInstitutionById(user.getInstitutionId());
+
+                // IF INSTITUTION DOES NOT EXIST
+                if (institutionExists == null) {
+                    ApiResponse<Object> institutionNotFound = new ApiResponse<>("Institution not found", null);
+                    return status(404).body(institutionNotFound);
+                }
+            }
+
+            // PARTIAL UPDATES
+            if (user.getFirstName() != null) {
+                existingUser.setFirstName(user.getFirstName());
+            }
+            if (user.getLastName() != null) {
+                existingUser.setLastName(user.getLastName());
+            }
+            if (user.getRole() != null) {
+                existingUser.setRole(user.getRole());
+            }
+            if (user.getPhone() != null) {
+                existingUser.setPhone(user.getPhone());
+            }
+            if (user.getInstitutionId() != null) {
+                existingUser.setInstitutionId(user.getInstitutionId());
+            }
+            userRepository.save(existingUser);
+            return status(200).body(
+                    new ApiResponse<>("User updated successfully", true)
+            );
         } catch (Exception e) {
-            return status(500).body(e.getMessage());
+            ApiResponse<Object> eResponse = new ApiResponse<>(e.getMessage(), null);
+            return status(500).body(eResponse);
         }
     }
 
@@ -106,15 +136,11 @@ public class UserController {
     ) UUID institutionId, @RequestParam(
             value = "role",
             required = false) String role) {
-        if (institutionId != null) {
-            ApiResponse<Object> usersList = new ApiResponse<>("Users retrieved successfully", userRepository.findByInstitutionId(institutionId));
+        if (institutionId != null || role != null) {
+            ApiResponse<Object> usersList = new ApiResponse<>("Users retrieved successfully", userRepository.findByRoleOrInstitutionId(role, institutionId));
             return status(200).body(usersList);
         }
-        if (role != null) {
-            ApiResponse<Object> usersList = new ApiResponse<>("Users retrieved successfully", userRepository.findByRole(role));
-            return status(200).body(usersList);
-        }
-        ApiResponse<Object> usersList = new ApiResponse<>("Users retrieved successfully", userRepository.findAll());
+        ApiResponse<Object> usersList = new ApiResponse<>("Users retrieved successfully", userRepository.findAllUsers());
         return status(200).body(usersList);
     }
 

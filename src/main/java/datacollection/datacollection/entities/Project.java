@@ -1,9 +1,15 @@
 package datacollection.datacollection.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -12,6 +18,8 @@ import java.util.UUID;
 @Table(name = "projects", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"name", "description"})
 })
+@Getter
+@Setter
 public class Project {
     // ID
     @Id
@@ -28,11 +36,11 @@ public class Project {
 
     // START DATE
     @Column(name = "start_date", nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     // END DATE
-    @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate = LocalDateTime.now().plusYears(1);
+    @Column(name = "end_date")
+    private LocalDate endDate = LocalDate.now().plusYears(1);
 
     // INSTITUTION ID
     @Column(name = "institution_id", nullable = false)
@@ -72,14 +80,17 @@ public class Project {
     // INSTITUTION
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "institution_id", insertable = false, updatable = false)
+    @JsonManagedReference
     private Institution institution;
 
     // USER
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JsonManagedReference
     private User user;
 
     // FORMS
+    @JsonBackReference
     @OneToMany(mappedBy = "project", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<Form> forms;
 }

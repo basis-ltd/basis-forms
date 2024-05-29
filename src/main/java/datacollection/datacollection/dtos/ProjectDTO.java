@@ -5,24 +5,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserAuthDTO {
+public class ProjectDTO {
+
     private UUID id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String password;
-    private String role;
-    private String phone;
+    private String name;
+    private String description;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private boolean isActive;
     private UUID institutionId;
+    private UUID userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private InstitutionDTO institution;
+    private CreatedByDTO user;
 }

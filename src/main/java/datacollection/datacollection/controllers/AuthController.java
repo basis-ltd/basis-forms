@@ -1,7 +1,6 @@
 package datacollection.datacollection.controllers;
 
 import datacollection.datacollection.dtos.UserAuthDTO;
-import datacollection.datacollection.entities.User;
 import datacollection.datacollection.repositories.UserRepository;
 import datacollection.datacollection.utils.ApiResponse;
 import datacollection.datacollection.utils.AuthResponse;
@@ -22,9 +21,8 @@ public class AuthController {
 
     // LOGIN
     @PostMapping(value = "/login")
-    public ResponseEntity<Object> login(@RequestBody User user) {
+    public ResponseEntity<Object> login(@RequestBody UserAuthDTO user) {
         try {
-            System.out.println(user);
             UserAuthDTO existingUser = userRepository.findByEmail(user.getEmail());
             if (existingUser == null) {
                 ApiResponse<Object> responseNotFound = new ApiResponse<>("User not found", null);

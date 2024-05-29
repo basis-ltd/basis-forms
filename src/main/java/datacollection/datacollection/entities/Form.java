@@ -1,17 +1,24 @@
 package datacollection.datacollection.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "Form")
 @Table(name = "forms")
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Form {
     // ID
     @Id
@@ -26,13 +33,13 @@ public class Form {
     @Column(name = "description", nullable = true, columnDefinition = "TEXT")
     private String description;
 
+    // VISIBILITY
+    @Column(name = "visibility", nullable = false)
+    private String visibility;
+
     // IS ACTIVE
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
-
-    // VISIBILITY
-    @Column(name = "visibility", nullable = false)
-    private String visibility = "public";
 
     // PROJECT ID
     @Column(name = "project_id", nullable = false)
@@ -65,12 +72,24 @@ public class Form {
     }
 
     // PROJECT
+    @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_id", insertable = false, updatable = false)
     private Project project;
 
     // USER
+    @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
+
+    // SECTIONS
+    @JsonBackReference
+    @OneToMany(mappedBy = "form", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Section> sections;
+
+    // ENTRIES
+    @JsonBackReference
+    @OneToMany(mappedBy = "form", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Entry> entries;
 }
