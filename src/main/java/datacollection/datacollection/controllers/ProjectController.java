@@ -42,6 +42,9 @@ public class ProjectController {
             // CHECK IF PROJECT EXISTS
             ProjectDTO projectExists = projectRepository.findProjectByNameAndDescription(project.getName(), project.getDescription());
 
+            // CHECK IF USER EXISTS
+            UserDTO userExists = userRepository.findUserById(project.getUserId());
+
             if (projectExists != null) {
                 ApiResponse<Object> projectAlreadyExists = new ApiResponse<>("Project already exists", stringsUtils.mapIdToObject(projectExists.getId()));
                 return ResponseEntity.status(409).body(projectAlreadyExists);
@@ -50,6 +53,11 @@ public class ProjectController {
             if (institutionExists == null) {
                 ApiResponse<Object> institutionNotFound = new ApiResponse<>("Institution not found", null);
                 return ResponseEntity.status(404).body(institutionNotFound);
+            }
+
+            if (userExists == null) {
+                ApiResponse<Object> userNotFound = new ApiResponse<>("User not found", null);
+                return ResponseEntity.status(404).body(userNotFound);
             }
 
             Project newProject = new Project();
